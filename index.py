@@ -1,23 +1,21 @@
 from flask import Flask, render_template, request, jsonify
-import requests
-import socket
+from services.get import send  # birleşik gateway önerisi
 
-app = Flask(__name__)
-
-# Dummy counters (gerçek sistemde DB veya cache ile tutulur)
-api_count = 2
-active_users = 5
-daily_ops = 12
+app = Flask(__name__, template_folder="templates", static_folder="static")
 
 @app.route("/")
-def home():
-    # Kullanıcının IP adresini al
-    user_ip = request.remote_addr
-    return render_template("panel.html",
-                           user_ip=user_ip,
-                           api_count=api_count,
-                           active_users=active_users,
-                           daily_ops=daily_ops)
+def panel():
+    return render_template("panel.html")
+
+@app.route("/send", methods=["POST"])
+def send_route():
+    mobile = request.form.get("mobile") or (request.json and request.json.get("mobile"))
+    if not mobile:
+        return jsonify({"success": False, "message": "mobile parametresi gerekli"}), 400
+
+    result_file = send(mobile, provider="file")
+    result_kredim = send(mobile, provider="kredim")
+    return jsonify({"file_market": result_file, "kredim": result_kredim})
 
 @app.route("/send", methods=["POST"])
 def send_sms():
