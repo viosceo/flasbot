@@ -3,9 +3,6 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Veritabanı bağlantısı (database.php)
-require_once '../server/database.php';
-
 // Yanıt türünü JSON olarak ayarlıyoruz
 header('Content-Type: application/json');
 
