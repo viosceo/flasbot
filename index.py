@@ -45,7 +45,7 @@ def do_register():
 # Panel
 @app.route('/panel')
 def panel():
-    return render_template('panel.html')
+    return render_template('panel.php')
 
 if __name__ == '__main__':
     if not os.path.exists(USER_DIR):
