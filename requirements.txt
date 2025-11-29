@@ -27,3 +27,4 @@ ntgcalls
 pillow
 py-tgcalls
 python-dotenv
+json
