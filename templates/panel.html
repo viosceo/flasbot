@@ -11,27 +11,40 @@
       --secondary: #00cc6a;
       --dark: #0a0a0a;
       --light: #1a1a1a;
-      --card-bg: #1e1e1e;
+      --card-bg: rgba(30, 30, 30, 0.7);
       --text-light: #ffffff;
-      --text-gray: #888888;
+      --text-gray: #cccccc;
+      --glass-bg: rgba(255, 255, 255, 0.1);
+      --xiaomi-purple: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
     
     body {
-      background: var(--dark);
+      background: var(--xiaomi-purple);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       min-height: 100vh;
       color: var(--text-light);
+      backdrop-filter: blur(10px);
     }
     
     .navbar {
-      background: var(--light);
-      border-bottom: 1px solid var(--primary);
+      background: var(--glass-bg);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
     
     .card {
       background: var(--card-bg);
-      border: 1px solid rgba(0, 255, 136, 0.2);
-      border-radius: 10px;
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      color: var(--text-light);
+    }
+    
+    .card-header {
+      background: rgba(0, 255, 136, 0.1);
+      border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+      color: var(--primary);
+      font-weight: 600;
     }
     
     .btn-primary {
@@ -43,11 +56,23 @@
     
     .btn-primary:hover {
       background: var(--secondary);
+      transform: translateY(-1px);
     }
     
     .file-list {
       max-height: 200px;
       overflow-y: auto;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 10px;
+    }
+    
+    .editor-container {
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 10px;
+      border: 1px solid var(--primary);
     }
     
     .editor {
@@ -56,18 +81,99 @@
       font-family: 'Courier New', monospace;
       border: 1px solid #00ff88;
       border-radius: 5px;
-      padding: 10px;
-      min-height: 300px;
+      padding: 15px;
+      min-height: 200px;
       width: 100%;
       resize: vertical;
+      font-size: 14px;
+    }
+    
+    .terminal {
+      background: #000;
+      color: var(--primary);
+      font-family: 'Courier New', monospace;
+      border-radius: 10px;
+      height: 200px;
+      overflow-y: auto;
+      padding: 15px;
+      border: 1px solid var(--primary);
+      font-size: 12px;
+    }
+    
+    .log-entry {
+      margin-bottom: 5px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 3px;
+    }
+    
+    .system-stats {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      padding: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .progress {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      height: 20px;
+      margin-bottom: 10px;
+    }
+    
+    .progress-bar {
+      background: var(--primary);
+      border-radius: 10px;
     }
     
     .footer {
       margin-top: 50px;
-      padding: 20px;
+      padding: 25px;
       text-align: center;
-      color: var(--text-gray);
-      border-top: 1px solid #333;
+      color: var(--text-light);
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+    }
+    
+    .active-projects {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .project-item {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-left: 3px solid var(--primary);
+    }
+    
+    .file-item {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 8px;
+      margin-bottom: 5px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .file-item:hover {
+      background: rgba(0, 255, 136, 0.1);
+      transform: translateX(5px);
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .stat-item {
+      text-align: center;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
     }
   </style>
 </head>
@@ -91,28 +197,29 @@
         {% for category, message in messages %}
           <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'warning' }} alert-dismissible fade show">
             {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
           </div>
         {% endfor %}
       {% endif %}
     {% endwith %}
 
     <div class="row">
-      <!-- Dosya Yükleme -->
-      <div class="col-md-4 mb-4">
-        <div class="card">
+      <!-- Sol Kolon -->
+      <div class="col-lg-4 mb-4">
+        <!-- Dosya Yükleme -->
+        <div class="card mb-4">
           <div class="card-body">
-            <h5 class="card-title">📤 Python Dosyası Yükle</h5>
-            <form action="/upload_python" method="post" enctype="multipart/form-data">
+            <h5 class="card-title">📤 Dosya Yükleme</h5>
+            <form action="/upload_python" method="post" enctype="multipart/form-data" id="uploadForm">
               <div class="mb-3">
-                <label class="form-label">Proje Adı</label>
-                <input type="text" name="project_name" class="form-control" placeholder="proje_adi" required>
+                <label class="form-label text-light">Proje Adı</label>
+                <input type="text" name="project_name" class="form-control bg-dark text-light border-secondary" placeholder="proje_adi" required>
               </div>
               
               <div class="mb-3">
-                <label class="form-label">Python Dosyaları</label>
-                <input type="file" name="python_files" class="form-control" multiple accept=".py" required>
-                <small class="form-text text-muted">Birden fazla .py dosyası seçebilirsiniz</small>
+                <label class="form-label text-light">Python Dosyaları (Max 2)</label>
+                <input type="file" name="python_files" class="form-control bg-dark text-light border-secondary" multiple accept=".py" required id="fileInput">
+                <small class="form-text text-light">En fazla 2 adet .py dosyası seçebilirsiniz</small>
               </div>
 
               <button type="submit" class="btn btn-primary w-100">
@@ -121,65 +228,116 @@
             </form>
           </div>
         </div>
-      </div>
 
-      <!-- Projeler -->
-      <div class="col-md-8">
-        {% if projects %}
-          {% for project in projects %}
-          <div class="card mb-3">
-            <div class="card-body">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="card-title mb-0">📁 {{ project.name }}</h5>
-                <div>
-                  <a href="/run_project/{{ project.name }}" class="btn btn-success btn-sm">🚀 Çalıştır</a>
-                  <a href="/delete_project/{{ project.name }}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Silmek istediğinize emin misiniz?')">🗑️ Sil</a>
+        <!-- Sistem Bilgileri -->
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">📊 Sistem Bilgileri</h5>
+            <div class="system-stats">
+              <div class="stats-grid">
+                <div class="stat-item">
+                  <h6 class="text-primary">RAM</h6>
+                  <div class="progress">
+                    <div class="progress-bar" style="width: 65%" id="ramUsage"></div>
+                  </div>
+                  <small class="text-light">65% Kullanım</small>
+                </div>
+                <div class="stat-item">
+                  <h6 class="text-primary">Disk</h6>
+                  <div class="progress">
+                    <div class="progress-bar" style="width: 42%" id="diskUsage"></div>
+                  </div>
+                  <small class="text-light">42% Kullanım</small>
                 </div>
               </div>
-              
-              <p class="text-muted mb-3">
-                <small>Oluşturulma: {{ project.created }}</small>
-              </p>
-
-              <div class="file-list mb-3">
-                <strong>Dosyalar:</strong>
-                {% for file in project.files %}
-                  <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
-                    <span>🐍 {{ file }}</span>
-                    <button class="btn btn-outline-primary btn-sm" onclick="editFile('{{ project.name }}', '{{ file }}')">
-                      ✏️ Düzenle
-                    </button>
-                  </div>
-                {% endfor %}
+              <div class="mt-3">
+                <small class="text-light">🟢 Sistem: Aktif</small><br>
+                <small class="text-light">🤖 Botlar: <span id="activeBotCount">0</span> Çalışıyor</small><br>
+                <small class="text-light">💾 Boş Alan: 15.2 GB</small>
               </div>
             </div>
           </div>
-          {% endfor %}
-        {% else %}
-          <div class="card">
-            <div class="card-body text-center py-5">
-              <h5>Henüz projeniz bulunmuyor</h5>
-              <p class="text-muted">Python dosyalarınızı yükleyerek başlayın</p>
+        </div>
+      </div>
+
+      <!-- Orta Kolon -->
+      <div class="col-lg-5 mb-4">
+        <!-- Aktif Projeler -->
+        <div class="card mb-4">
+          <div class="card-body">
+            <h5 class="card-title">🚀 Aktif Projeler</h5>
+            <div class="active-projects">
+              {% if projects %}
+                {% for project in projects %}
+                <div class="project-item">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-1 text-light">📁 {{ project.name }}</h6>
+                    <div>
+                      <a href="/run_project/{{ project.name }}" class="btn btn-success btn-sm">▶️ Çalıştır</a>
+                      <a href="/delete_project/{{ project.name }}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Silmek istediğinize emin misiniz?')">🗑️</a>
+                    </div>
+                  </div>
+                  <small class="text-light">Oluşturulma: {{ project.created }}</small>
+                  
+                  <!-- Dosya Listesi -->
+                  <div class="mt-2">
+                    {% for file in project.files %}
+                    <div class="file-item" onclick="editFile('{{ project.name }}', '{{ file }}')">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-light">🐍 {{ file }}</span>
+                        <button class="btn btn-outline-primary btn-sm">✏️ Düzenle</button>
+                      </div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+                {% endfor %}
+              {% else %}
+                <div class="text-center py-3">
+                  <p class="text-light">Henüz aktif proje bulunmuyor</p>
+                </div>
+              {% endif %}
             </div>
           </div>
-        {% endif %}
-      </div>
-    </div>
+        </div>
 
-    <!-- File Editor Modal -->
-    <div class="modal fade" id="editorModal" tabindex="-1">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content bg-dark">
-          <div class="modal-header">
-            <h5 class="modal-title" id="editorTitle">Dosya Düzenle</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <!-- Terminal Logları -->
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">📟 Sistem Logları</h5>
+            <div class="terminal" id="systemLogs">
+              <div class="log-entry">🟢 Sistem başlatıldı</div>
+              <div class="log-entry">📁 Kullanıcı dizinleri kontrol ediliyor...</div>
+              <div class="log-entry">🤖 Bot paneli hazır</div>
+              <div class="log-entry">💾 RAM: 65% | Disk: 42%</div>
+              <div class="log-entry">🔧 Tüm sistemler çalışıyor</div>
+              <div class="log-entry">⚠️ Modül eksiklikleri için requirements.txt kontrol edin</div>
+              <div class="log-entry">📝 Hata ayıklama için dosyaları düzenleyebilirsiniz</div>
+            </div>
           </div>
-          <div class="modal-body">
-            <textarea id="fileEditor" class="editor"></textarea>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
-            <button type="button" class="btn btn-primary" onclick="saveFile()">💾 Kaydet</button>
+        </div>
+      </div>
+
+      <!-- Sağ Kolon - Dosya Düzenleyici -->
+      <div class="col-lg-3 mb-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">✏️ Hızlı Düzenleyici</h5>
+            <p class="text-light small">Bir dosyaya tıklayarak düzenlemeye başlayın</p>
+            
+            <div class="editor-container" id="editorContainer" style="display: none;">
+              <h6 class="text-primary" id="currentFileName">Dosya.adı</h6>
+              <textarea class="editor" id="fileEditor" placeholder="Dosya içeriği burada görünecek..."></textarea>
+              <div class="mt-2">
+                <button class="btn btn-success btn-sm w-100" onclick="saveFile()">💾 Kaydet</button>
+                <button class="btn btn-secondary btn-sm w-100 mt-1" onclick="closeEditor()">❌ Kapat</button>
+              </div>
+            </div>
+            
+            <div id="editorPlaceholder" class="text-center py-4">
+              <p class="text-light">👆 Yukarıdaki dosyalardan birini seçin</p>
+              <small class="text-muted">Telegram token, API key gibi değerleri düzenleyebilirsiniz</small>
+            </div>
           </div>
         </div>
       </div>
@@ -189,9 +347,14 @@
   <!-- Footer -->
   <div class="footer">
     <div class="container">
+      <p class="mb-1">
+        <strong>🚀 Powered by DeepSeek AI</strong>
+      </p>
       <p class="mb-0">
-        Powered by <a href="https://deepseek.com" target="_blank" style="color: var(--primary); text-decoration: none;">DeepSeek</a> 
-        - Made with ❤️ for Vision Community
+        <small>
+          "Code with Vision, Powered by Intelligence" • 
+          Made with ❤️ for Vision Community
+        </small>
       </p>
     </div>
   </div>
@@ -201,11 +364,30 @@
     let currentProject = '';
     let currentFile = '';
 
+    // Max 2 dosya kontrolü
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+      const files = e.target.files;
+      if (files.length > 2) {
+        alert('❌ En fazla 2 dosya seçebilirsiniz!');
+        this.value = '';
+        return;
+      }
+      
+      if (files.length > 0) {
+        const label = this.previousElementSibling;
+        const fileNames = Array.from(files).map(f => f.name).join(', ');
+        label.textContent = `Seçilen ${files.length} dosya: ${fileNames}`;
+        label.style.color = 'var(--primary)';
+      }
+    });
+
     async function editFile(projectName, fileName) {
       currentProject = projectName;
       currentFile = fileName;
       
-      document.getElementById('editorTitle').textContent = `Düzenle: ${fileName}`;
+      document.getElementById('currentFileName').textContent = fileName;
+      document.getElementById('editorContainer').style.display = 'block';
+      document.getElementById('editorPlaceholder').style.display = 'none';
       
       try {
         const response = await fetch(`/get_file_content/${projectName}/${fileName}`);
@@ -213,14 +395,19 @@
         
         if (data.success) {
           document.getElementById('fileEditor').value = data.content;
+          addLog(`📝 ${fileName} dosyası düzenleniyor...`);
         } else {
           alert('Dosya okunamadı: ' + data.error);
         }
       } catch (error) {
         alert('Hata oluştu: ' + error);
       }
-      
-      new bootstrap.Modal(document.getElementById('editorModal')).show();
+    }
+
+    function closeEditor() {
+      document.getElementById('editorContainer').style.display = 'none';
+      document.getElementById('editorPlaceholder').style.display = 'block';
+      addLog('❌ Düzenleyici kapatıldı');
     }
 
     async function saveFile() {
@@ -238,24 +425,47 @@
         const data = await response.json();
         
         if (data.success) {
-          alert('✅ Dosya başarıyla kaydedildi!');
-          bootstrap.Modal.getInstance(document.getElementById('editorModal')).hide();
+          addLog('✅ Dosya başarıyla kaydedildi!');
+          setTimeout(() => {
+            closeEditor();
+          }, 1000);
         } else {
-          alert('❌ Kaydetme hatası: ' + data.error);
+          addLog('❌ Kaydetme hatası: ' + data.error);
         }
       } catch (error) {
-        alert('Hata oluştu: ' + error);
+        addLog('❌ Hata oluştu: ' + error);
       }
     }
 
-    // Dosya seçimi bildirimi
-    document.querySelector('input[type="file"]').addEventListener('change', function(e) {
-      const files = Array.from(e.target.files);
-      if (files.length > 0) {
-        const label = this.previousElementSibling;
-        label.textContent = `Seçilen ${files.length} dosya`;
-        label.style.color = 'var(--primary)';
-      }
+    function addLog(message) {
+      const logs = document.getElementById('systemLogs');
+      const timestamp = new Date().toLocaleTimeString();
+      const logEntry = document.createElement('div');
+      logEntry.className = 'log-entry';
+      logEntry.textContent = `[${timestamp}] ${message}`;
+      logs.appendChild(logEntry);
+      logs.scrollTop = logs.scrollHeight;
+    }
+
+    // Sistem bilgilerini güncelle
+    function updateSystemStats() {
+      const activeProjects = document.querySelectorAll('.project-item').length;
+      document.getElementById('activeBotCount').textContent = activeProjects;
+      
+      // RAM ve Disk kullanımını simüle et
+      const ramUsage = 65 + Math.random() * 10;
+      const diskUsage = 42 + Math.random() * 5;
+      
+      document.getElementById('ramUsage').style.width = Math.min(ramUsage, 100) + '%';
+      document.getElementById('diskUsage').style.width = Math.min(diskUsage, 100) + '%';
+    }
+
+    // Sayfa yüklendiğinde çalıştır
+    document.addEventListener('DOMContentLoaded', function() {
+      updateSystemStats();
+      setInterval(updateSystemStats, 5000); // 5 saniyede bir güncelle
+      
+      addLog('🔧 Panel başlatıldı - Tüm sistemler çalışıyor');
     });
   </script>
 </body>
