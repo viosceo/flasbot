@@ -41,7 +41,7 @@
 ## 🛠 Kurulum
 
 ```local
-git clone https://github.com/viosceo/flasbot
+https://github.com/melissaroseria/flasbot
 cd flasbot
 python setup.py
 ```
