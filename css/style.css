@@ -1,9 +1,17 @@
 body {
   font-family: 'Segoe UI', sans-serif;
 }
-
 .card {
   border-radius: 12px;
+}
+.terminal {
+  font-family: 'Courier New', monospace;
+  background-color: #000;
+  color: #0f0;
+  border: 1px solid #333;
+}
+.list-group-item:hover {
+  background-color: #222;
 }
 
 .nav-link:hover {
