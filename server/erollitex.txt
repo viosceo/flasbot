@@ -1,0 +1,3 @@
+email: hakandemo@gmail.com
+username: erollitex
+password: erollitex
