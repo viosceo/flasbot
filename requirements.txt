@@ -16,3 +16,14 @@ asyncio
 instaloader
 tgcrypto
 sqlite
+aiofiles
+aiohttp
+asyncio
+gitpython
+httpx
+heroku3
+motor
+ntgcalls
+pillow
+py-tgcalls
+python-dotenv
